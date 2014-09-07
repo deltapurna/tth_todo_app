@@ -41,6 +41,10 @@ var createNewTask = function(taskName) {
 }
 // Add a new task
 var addTask = function() {
+  if (taskInput.value.trim() == '') {
+    alert('Task name is compulsory');
+    return;
+  }
   console.log('Add task...');
   // Create a new list item with the text from #new-task:
   var task = createNewTask(taskInput.value);
@@ -50,6 +54,8 @@ var addTask = function() {
 
   // Bind to event handler
   bindTaskEvents(task, taskCompleted);
+
+  taskInput.value = '';
 };
 
 // Edit an existing task
@@ -64,9 +70,11 @@ var editTask = function() {
 
   if (isEditMode) {
     // Switch from .editMode
+    this.innerText = 'Edit';
     label.innerText = textInput.value;
   } else {
     // Switch to .editMode
+    this.innerText = 'Save';
     textInput.value = label.innerText;
   }
   task.classList.toggle('editMode');
@@ -110,15 +118,20 @@ var bindTaskEvents = function(taskListItem, checkBoxEventHandler) {
   var editButton = taskListItem.querySelector('button.edit');
   var deleteButton = taskListItem.querySelector('button.delete');
     // bind editTask to edit button
-  editButton.onclick = editTask;
+  editButton.addEventListener('click', editTask);
     // bind deleteTask to delete button
-  deleteButton.onclick = deleteTask;
+  deleteButton.addEventListener('click', deleteTask);
     // bind checkBoxEventHandler to checkbox
   checkboxInput.onchange = checkBoxEventHandler;
 };
 
+var ajaxRequest = function() {
+  console.log('make ajax request');
+};
+
 // Set click handler to addTask function
-addButton.onclick = addTask;
+addButton.addEventListener('click', addTask);
+addButton.addEventListener('click', ajaxRequest);
 
 // Cycle over incompleteTasksHolder ul list items
 for (var i = 0; i < incompleteTasksHolder.children.length; i++) {
