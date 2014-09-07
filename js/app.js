@@ -125,14 +125,47 @@ var bindTaskEvents = function(taskListItem, checkBoxEventHandler) {
   checkboxInput.onchange = checkBoxEventHandler;
 };
 
-var ajaxRequest = function() {
+var ajaxRequest = function(method, url, params){
   console.log('make ajax request');
-};
+  var httpRequest = new XMLHttpRequest();
+  httpRequest.onreadystatechange = function(){
+    if(httpRequest.readyState === 4){
+      console.log(httpRequest.status);
+      if(httpRequest.status === 200) {
+        response = JSON.parse(httpRequest.responseText);
+        console.log(response);
+        renderTasks(response);
+      } else {
+        console.log(httpRequest.status);
+      }
+    }
+  };
+  httpRequest.open(method, url, true);
+  httpRequest.send(params);
+}
+
+var renderTasks = function(response) {
+  console.log('Processing...');
+  for (var i = 0; i < response.length; i++) {
+    var taskObj = response[i];
+    var taskName = taskObj.name;
+    var isCompleted = taskObj.completed_at !== null;
+    var task = createNewTask(taskName);
+    if(isCompleted){
+      completedTasksHolder.appendChild(task);
+      bindTaskEvents(task, taskIncomplete);
+    } else {
+      incompleteTasksHolder.appendChild(task);
+      bindTaskEvents(task, taskCompleted);
+    }
+  }
+}
 
 // Set click handler to addTask function
 addButton.addEventListener('click', addTask);
-addButton.addEventListener('click', ajaxRequest);
 
+ajaxRequest('GET', 'http://localhost:3000/tasks', null);
+ajaxRequest('GET', 'http://localhost:3000/tasks?completed=true');
 // Cycle over incompleteTasksHolder ul list items
 for (var i = 0; i < incompleteTasksHolder.children.length; i++) {
   // for each list item
